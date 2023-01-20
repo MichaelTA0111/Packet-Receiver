@@ -17,17 +17,13 @@
 #define MAXBUFLEN 200
 
 
-void consume_packet(Consumer *consumer)
-{
-    consumer_increment_counter(consumer);
-    return;
-}
-
 /*
  * Create a network socket
  */
 static int
-create_socket(const char *port, struct addrinfo *servinfo, struct addrinfo **p, int do_bind) {
+create_socket(const char *port, struct addrinfo *servinfo, struct addrinfo **p,
+        int do_bind)
+{
     int sockfd;
     struct addrinfo hints, *q;
     int rv;
@@ -87,6 +83,8 @@ int receive_packet(Consumer *consumer, int sockfd)
         exit(1);
     }
 
+    printf("Received packet successfully!\n");
+
     buf[numbytes] = '\0';
     if (!strcmp(buf, "FINISHED")) {
         printf("Finished receiving packets!\n");
@@ -95,6 +93,7 @@ int receive_packet(Consumer *consumer, int sockfd)
 
     consumer_increment_counter(consumer);
 
+    /*
     printf("Packet of length %d bytes received!\n", numbytes);
     printf("0x%lX %p %u\n", cheri_getperm(buf),
             buf,
@@ -119,6 +118,7 @@ int receive_packet(Consumer *consumer, int sockfd)
     }
 
     printf("Consumer counter %lu\n", consumer->counter);
+    */
 
     return 1;
 }
