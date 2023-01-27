@@ -74,7 +74,7 @@ int receive_packet(Consumer *consumer, int sockfd)
     socklen_t addr_len;
     char buf[MAXBUFLEN];
 
-    printf("Waiting for packet...\n");
+    // printf("Waiting for packet...\n");
 
     addr_len = sizeof their_addr;
     if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,
@@ -83,11 +83,11 @@ int receive_packet(Consumer *consumer, int sockfd)
         exit(1);
     }
 
-    printf("Received packet successfully!\n");
+    // printf("Received packet successfully!\n");
 
     buf[numbytes] = '\0';
     if (!strcmp(buf, "FINISHED")) {
-        printf("Finished receiving packets!\n");
+        // printf("Finished receiving packets!\n");
         return 0;
     }
 
@@ -129,7 +129,7 @@ void send_consumer_details(Consumer *consumer, int sockfd, struct addrinfo *p)
     char msg[MAXBUFLEN];
 
     sprintf(msg, "%lu", consumer->counter);
-    printf("%s\n", msg);
+    // printf("%s\n", msg);
 
     if ((numbytes = sendto(sockfd, msg, strlen(msg),
             0, p->ai_addr, p->ai_addrlen)) == -1) {
@@ -137,7 +137,7 @@ void send_consumer_details(Consumer *consumer, int sockfd, struct addrinfo *p)
         exit(1);
     }
 
-    printf("Sent %d bytes to application.\n", numbytes);
+    // printf("Sent %d bytes to application.\n", numbytes);
 }
 
 int main(int argc, char *argv[])
@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
 
     const char *src_port = argv[1];
     const char *dst_port = argv[2];
-    printf("Ports %s %s\n", src_port, dst_port);
+    // printf("Ports %s %s\n", src_port, dst_port);
 
     if ((sockfd = create_socket(src_port, servinfo, &p, 1)) < 0) {
         printf("Error creating socket!\n");
