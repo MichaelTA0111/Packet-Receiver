@@ -8,8 +8,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <cheri/cheri.h>
-#include <cheri/cheric.h>
 #include <math.h>
 
 #include "consumer.h"

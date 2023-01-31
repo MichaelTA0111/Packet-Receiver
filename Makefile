@@ -2,7 +2,7 @@
 CC = cc
 
 # Compiler flags:
-CFLAGS = -g -O2 -Wall
+CFLAGS = -g -O2 -Wall -march=morello -mabi=aapcs
 
 # Files to link:
 LFLAGS = consumer.c
