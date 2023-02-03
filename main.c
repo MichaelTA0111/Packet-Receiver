@@ -15,6 +15,9 @@
 #define MAXBUFLEN 200
 
 
+int do_print = 1;
+
+
 /*
  * Create a network socket
  */
@@ -72,7 +75,9 @@ int receive_packet(Consumer *consumer, int sockfd)
     socklen_t addr_len;
     char buf[MAXBUFLEN];
 
-    // printf("Waiting for packet...\n");
+    if (do_print) {
+        printf("Waiting for packet...\n");
+    }
 
     addr_len = sizeof their_addr;
     if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,
@@ -81,42 +86,45 @@ int receive_packet(Consumer *consumer, int sockfd)
         exit(1);
     }
 
-    // printf("Received packet successfully!\n");
+    if (do_print) {
+        printf("Received packet successfully!\n");
+    }
 
     buf[numbytes] = '\0';
     if (!strcmp(buf, "FINISHED")) {
-        // printf("Finished receiving packets!\n");
+        if (do_print) {
+            printf("Finished receiving packets!\n");
+        }
         return 0;
     }
 
     consumer_increment_counter(consumer);
 
-    /*
-    printf("Packet of length %d bytes received!\n", numbytes);
-    printf("0x%lX %p %u\n", cheri_getperm(buf),
-            buf,
-            numbytes);
+    if (do_print == 2) {
+        printf("Packet of length %d bytes received!\n", numbytes);
 
-    int i, j;
-    for (i = 0; i < ceil((double) numbytes / 16.0); i++) {
-	for (j = 0; j < 16; j++) {
-	    if (i*16+j < numbytes) { 
-	        printf("%02X ", buf[i*16+j]);
-	    } else {
-	        printf("   ");
-	    }
+        int i, j;
+        for (i = 0; i < ceil((double) numbytes / 16.0); i++) {
+            for (j = 0; j < 16; j++) {
+                if (i*16+j < numbytes) { 
+                    printf("%02X ", buf[i*16+j]);
+                } else {
+                    printf("   ");
+                }
+            }
+            printf("| ");
+            for (j = 0; j < 16; j++) {
+                if (i*16+j < numbytes) { 
+                    printf("%c", buf[i*16+j]);
+                }
+            }
+        printf("\n");
         }
-	printf("| ");
-	for (j = 0; j < 16; j++) {
-	    if (i*16+j < numbytes) { 
-	        printf("%c", buf[i*16+j]);
-	    }
-        }
-	printf("\n");
     }
 
-    printf("Consumer counter %lu\n", consumer->counter);
-    */
+    if (do_print) {
+        printf("Current consumer counter %lu\n", consumer->counter);
+    }
 
     return 1;
 }
@@ -127,7 +135,6 @@ void send_consumer_details(Consumer *consumer, int sockfd, struct addrinfo *p)
     char msg[MAXBUFLEN];
 
     sprintf(msg, "%lu", consumer->counter);
-    // printf("%s\n", msg);
 
     if ((numbytes = sendto(sockfd, msg, strlen(msg),
             0, p->ai_addr, p->ai_addrlen)) == -1) {
@@ -135,25 +142,52 @@ void send_consumer_details(Consumer *consumer, int sockfd, struct addrinfo *p)
         exit(1);
     }
 
-    // printf("Sent %d bytes to application.\n", numbytes);
+    if (do_print) {
+        printf("Sent %d bytes to application.\n", numbytes);
+    }
 }
 
 int main(int argc, char *argv[])
 {
+    int opt;
+    int consumer_no;
+
+    if (argc < 2) {
+        fprintf(stderr,"usage: ./application.o CONSUMER_NUMBER \n");
+        exit(1);
+    }
+
+    consumer_no = atoi(argv[1]);
+    optind = 2;
+
+    while ((opt = getopt(argc, argv, "qv")) != -1) {
+        switch(opt) {
+        case 'q':
+            do_print = 0;
+            printf("Selected quiet mode\n");
+            break;
+        case 'v':
+            do_print = 2;
+            printf("Selected verbose mode\n");
+            break;
+        case '?':
+            printf("Unknown option: %c\n", optopt);
+            break;
+        }
+    }
+
+    char src_port[5], dst_port[5];
+    sprintf(src_port, "%i", 5000 + consumer_no);
+    sprintf(dst_port, "%i", 4000 + consumer_no);
+    if (do_print) {
+        printf("Source port %s\nDestination port %s\n", src_port, dst_port);
+    }
+
     int sockfd;
     Consumer consumer;
     struct addrinfo *servinfo = NULL, *p;
 
     consumer.counter = 0;
-
-    if (argc != 3) {
-        fprintf(stderr,"usage: ./application.o SRC_PORT DST_PORT\n");
-        exit(1);
-    }
-
-    const char *src_port = argv[1];
-    const char *dst_port = argv[2];
-    // printf("Ports %s %s\n", src_port, dst_port);
 
     if ((sockfd = create_socket(src_port, servinfo, &p, 1)) < 0) {
         printf("Error creating socket!\n");
