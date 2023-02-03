@@ -160,6 +160,18 @@ int main(int argc, char *argv[])
     consumer_no = atoi(argv[1]);
     optind = 2;
 
+    char *quiet = getenv("PYTILIA_QUIET");
+    if (quiet && (strcasecmp(quiet, "yes") == 0)) {
+        printf("Selected quiet mode.\n");
+        do_print = 0;
+    }
+
+    char *verbose = getenv("PYTILIA_VERBOSE");
+    if (verbose && (strcasecmp(verbose, "yes") == 0)) {
+        printf("Selected verbose mode.\n");
+        do_print = 2;
+    }
+
     while ((opt = getopt(argc, argv, "qv")) != -1) {
         switch(opt) {
         case 'q':
