@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
     int consumer_no;
 
     if (argc < 2) {
-        fprintf(stderr,"usage: ./application.o CONSUMER_NUMBER \n");
+        fprintf(stderr,"usage: ./application.o CONSUMER_NUMBER\n");
         exit(1);
     }
 
