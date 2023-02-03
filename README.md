@@ -10,7 +10,7 @@ Run the `make` command to build the application.
 
 Use the command `./application.o CONSUMER_NUMBER` to run the application manually, where `CONSUMER_NUMBER` is the integer ID of the consumer.
 
-The `-q` flag will run the application in quiet mode.
+The `-q` flag or `PYTILIA_QUIET` environment variable will run the application in quiet mode.
 
-The `-v` flag will run the application in verbose mode.
+The `-v` flag or `PYTILIA_VERBOSE` environment variable will run the application in verbose mode.
 
