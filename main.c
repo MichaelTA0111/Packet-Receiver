@@ -176,7 +176,6 @@ int main(int argc, char *argv[])
         switch(opt) {
         case 'q':
             do_print = 0;
-            printf("Selected quiet mode\n");
             break;
         case 'v':
             do_print = 2;
